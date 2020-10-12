@@ -48,6 +48,7 @@ if __name__ == "__main__":
     alpha = args.alpha
     beta = args.beta
     EVAPORATION = args.evaporation
+    elitism = args.elitism
     if args.seed == -1:
         seed = np.random.randint(0, 1000000)
         print("Using randomly generated seed:", seed)
@@ -79,19 +80,19 @@ if __name__ == "__main__":
 
     pool_args = []
     for NODE in unique_nodes:
-        pool_args.append((ADJ_MAT, FERO_MAT, MAX_IT, MAX_ANTS, NODE, alpha, beta, EVAPORATION))
+        pool_args.append((ADJ_MAT, FERO_MAT, MAX_IT, MAX_ANTS, NODE, alpha, beta, EVAPORATION, elitism))
     BEST_SOLUTION_LIST = pool.map(Parallel_ACO, pool_args)
 
-    overall_best = [[], 0]
-    for item in BEST_SOLUTION_LIST:
-        if item[1] > overall_best[1]:
-            overall_best = item
+    overall_best = 0
+    for list_item in BEST_SOLUTION_LIST:
+        for item in list_item:
+            if item > overall_best:
+                overall_best = item
 
 
-    EXP_LOG['Path'] = overall_best[0]
-    EXP_LOG['Biggest Sum'] = overall_best[1]
-    # print("Path:", overall_best[0], "|| Sum:", overall_best[1])
-    # print(EXP_LOG)
+    # EXP_LOG['Path'] = overall_best[0]
+    EXP_LOG['Biggest Sum'] = overall_best
+    EXP_LOG['Best of each iteration'] = BEST_SOLUTION_LIST
     print("Code done running!")
 
     OUT_FILE_NAME = os.path.join(output_path, "exp_log.pkl")

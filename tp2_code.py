@@ -72,10 +72,16 @@ def build_solution(ADJ_MAT, FERO_MAT, start_node, alpha, beta):
     return SOLUTION, SUM
 
 
-def update_pheromone(ALL_SOLUTIONS, BEST_SOLUTION, FERO_MAT, EVAPORATION, elitism=False):
-    FERO_MAT * (1 - EVAPORATION)
+def update_pheromone(ALL_SOLUTIONS, FERO_MAT, EVAPORATION, elitism=False):
+    FERO_MAT *= (1 - EVAPORATION)
 
     if (elitism):
+        BEST_SOLUTION = [[], 0]
+        for j in range(len(ALL_SOLUTIONS)):
+            if ALL_SOLUTIONS[1][j] > BEST_SOLUTION[1]:
+                BEST_SOLUTION[1] = ALL_SOLUTIONS[1][j]
+                BEST_SOLUTION[0] = ALL_SOLUTIONS[0][j]
+
         for i in range(len(BEST_SOLUTION)-1):
             FERO_MAT[ BEST_SOLUTION[0][i], BEST_SOLUTION[0][i+1] ] += BEST_SOLUTION[1]
 
@@ -88,34 +94,32 @@ def update_pheromone(ALL_SOLUTIONS, BEST_SOLUTION, FERO_MAT, EVAPORATION, elitis
 
 
 
-def ACO(ADJ_MAT, FERO_MAT, MAX_IT, MAX_ANTS, NODE, alpha, beta, EVAPORATION):
+def ACO(ADJ_MAT, FERO_MAT, MAX_IT, MAX_ANTS, NODE, alpha, beta, EVAPORATION, elitism):
     print("ACO: running from node", NODE)
     t=0
+    BEST_SUMS = []
     while(t < MAX_IT):
-        BEST_SOLUTION = [[],0]
         ALL_SOLUTIONS = [[], []]
         SOLUTION = []
+        best = 0
         for ant in range(MAX_ANTS):
             SOLUTION, SUM = build_solution(ADJ_MAT, FERO_MAT, NODE, alpha, beta)
             ALL_SOLUTIONS[0].append(SOLUTION)
             ALL_SOLUTIONS[1].append(SUM)
-            if SUM > BEST_SOLUTION[1]:
-                BEST_SOLUTION = [SOLUTION, SUM]
+            if SUM > best:
+                best = SUM
         
-        # if BEST_SOLUTION[1] > OVERALL_BEST:
-        #     BEST_DO_BEST = BEST_SOLUTION[1]
-        # print("Final sum:", BEST_SOLUTION[1], "|| BEST sum:", OVERALL_BEST)
-        
-        update_pheromone(ALL_SOLUTIONS, BEST_SOLUTION, FERO_MAT, EVAPORATION, elitism=True)
+        update_pheromone(ALL_SOLUTIONS, FERO_MAT, EVAPORATION, elitism)
+        BEST_SUMS.append(best)
         t += 1
 
     print("ACO: exiting from node", NODE, '------')
-    return BEST_SOLUTION
+    return BEST_SUMS
     
 
 def Parallel_ACO(args):
-    ADJ_MAT, FERO_MAT, MAX_IT, MAX_ANTS, NODE, alpha, beta, EVAPORATION = args
-    return ACO(ADJ_MAT, FERO_MAT, MAX_IT, MAX_ANTS, NODE, alpha, beta, EVAPORATION)
+    ADJ_MAT, FERO_MAT, MAX_IT, MAX_ANTS, NODE, alpha, beta, EVAPORATION, elitism = args
+    return ACO(ADJ_MAT, FERO_MAT, MAX_IT, MAX_ANTS, NODE, alpha, beta, EVAPORATION, elitism)
 
 # def f_parallel(args):
 #     x, y = args

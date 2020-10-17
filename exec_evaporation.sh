@@ -1,19 +1,19 @@
 
 # Experiment varying evaporation
 mkdir logs -p
-for counter in $(seq 1 10) 
-do
-    echo "Running exp on evaporation: 0.1 || Entrada1 || Counter: $counter"
-    python3 main.py --input "bases_grafos/entrada1.txt" --evaporation 0.1 --id "evaporation-01-entrada1-$counter" > logs/results-evaporation-entrada1-evaporation-01-$counter-run.log
+# for counter in $(seq 1 10) 
+# do
+#     echo "Running exp on evaporation: 0.1 || Entrada1 || Counter: $counter"
+#     python3 main.py --input "bases_grafos/entrada1.txt" --evaporation 0.1 --id "evaporation-01-entrada1-$counter" > logs/results-evaporation-entrada1-evaporation-01-$counter-run.log
 
-    echo "Running exp on evaporation: 0.2 || Entrada1 || Counter: $counter"
-    python3 main.py --input "bases_grafos/entrada1.txt" --evaporation 0.2 --id "evaporation-02-entrada1-$counter" > logs/results-evaporation-entrada1-evaporation-02-$counter-run.log
+#     echo "Running exp on evaporation: 0.2 || Entrada1 || Counter: $counter"
+#     python3 main.py --input "bases_grafos/entrada1.txt" --evaporation 0.2 --id "evaporation-02-entrada1-$counter" > logs/results-evaporation-entrada1-evaporation-02-$counter-run.log
 
-    echo "Running exp on evaporation: 0.5 || Entrada1 || Counter: $counter"
-    python3 main.py --input "bases_grafos/entrada1.txt" --evaporation 0.5 --id "evaporation-05-entrada1-$counter" > logs/results-evaporation-entrada1-evaporation-05-$counter-run.log
+#     echo "Running exp on evaporation: 0.5 || Entrada1 || Counter: $counter"
+#     python3 main.py --input "bases_grafos/entrada1.txt" --evaporation 0.5 --id "evaporation-05-entrada1-$counter" > logs/results-evaporation-entrada1-evaporation-05-$counter-run.log
 
-done
-echo "Done entrada1"
+# done
+# echo "Done entrada1"
 
 for counter in $(seq 1 10) 
 do

@@ -1,5 +1,7 @@
 import numpy as np
 import pdb
+import multiprocessing
+from tqdm import tqdm
 
 def read_input(filename):
     new_input = open(filename, 'r')
@@ -73,6 +75,7 @@ def build_solution(ADJ_MAT, FERO_MAT, start_node, alpha, beta):
 
 
 def update_pheromone(ALL_SOLUTIONS, FERO_MAT, EVAPORATION, elitism=False):
+    ALL_SOLUTIONS = [[result[0] for result in ALL_SOLUTIONS], [result[1] for result in ALL_SOLUTIONS]]
     FERO_MAT *= (1 - EVAPORATION)
 
     if (elitism):
@@ -94,32 +97,33 @@ def update_pheromone(ALL_SOLUTIONS, FERO_MAT, EVAPORATION, elitism=False):
 
 
 
-def ACO(ADJ_MAT, FERO_MAT, MAX_IT, MAX_ANTS, NODE, alpha, beta, EVAPORATION, elitism):
-    print("ACO: running from node", NODE)
+def ACO(ADJ_MAT, FERO_MAT, MAX_IT, MAX_ANTS, alpha, beta, EVAPORATION, elitism, cpus):
     t=0
-    BEST_SUMS = []
-    while(t < MAX_IT):
+    pool = multiprocessing.Pool(processes=cpus)
+    STORING_ALL_SOLUTIONS = []
+    for t in tqdm(range(MAX_IT)):
         ALL_SOLUTIONS = [[], []]
         SOLUTION = []
         best = 0
+        
+        pool_args = []
         for ant in range(MAX_ANTS):
-            SOLUTION, SUM = build_solution(ADJ_MAT, FERO_MAT, NODE, alpha, beta)
-            ALL_SOLUTIONS[0].append(SOLUTION)
-            ALL_SOLUTIONS[1].append(SUM)
-            if SUM > best:
-                best = SUM
+            pool_args.append((ADJ_MAT, FERO_MAT, alpha, beta))
+        ALL_SOLUTIONS = pool.map(Parallel_build_solution, pool_args)
+        
+        STORING_ALL_SOLUTIONS.append(ALL_SOLUTIONS)
         
         update_pheromone(ALL_SOLUTIONS, FERO_MAT, EVAPORATION, elitism)
-        BEST_SUMS.append(best)
-        t += 1
 
-    print("ACO: exiting from node", NODE, '------')
-    return BEST_SUMS
+    return STORING_ALL_SOLUTIONS
     
 
-def Parallel_ACO(args):
-    ADJ_MAT, FERO_MAT, MAX_IT, MAX_ANTS, NODE, alpha, beta, EVAPORATION, elitism = args
-    return ACO(ADJ_MAT, FERO_MAT, MAX_IT, MAX_ANTS, NODE, alpha, beta, EVAPORATION, elitism)
+def Parallel_build_solution(args):
+    ADJ_MAT, FERO_MAT, alpha, beta = args
+    graph_size = len(ADJ_MAT)
+    start_node = np.random.randint(0, graph_size)
+    return build_solution(ADJ_MAT, FERO_MAT, start_node, alpha, beta)
+
 
 # def f_parallel(args):
 #     x, y = args

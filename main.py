@@ -24,7 +24,7 @@ def parseArgs():
     parser = argparse.ArgumentParser()
     parser.add_argument("-a","--alpha", type=int, default=1, help="Pheromone importance")
     parser.add_argument("-b","--beta", type=int, default=2, help="Node weight importance")
-    parser.add_argument("-s","--maxAnts", type=int, default=10, help="Maximum amount of ants")
+    parser.add_argument("-s","--maxAnts", type=int, default=50, help="Maximum amount of ants")
     parser.add_argument("-p","--evaporation", type=float, default=0.2, help="Evaporation rate")
     parser.add_argument("-e","--elitism", action="store_true", default=True, help="Use Elitism")
     parser.add_argument("-m","--maxIter", type=int, default=100, help="Maximum amount of iterations")
@@ -72,27 +72,29 @@ if __name__ == "__main__":
     cpus = args.cores
     if args.cores == -1:
         cpus = os.cpu_count()
-    pool = multiprocessing.Pool(processes=cpus)
 
 
     unique_nodes, weights_list = read_input(args.input)
     ADJ_MAT, FERO_MAT = initialize_matrix(unique_nodes, weights_list)
 
-    pool_args = []
-    for NODE in unique_nodes:
-        pool_args.append((ADJ_MAT, FERO_MAT, MAX_IT, MAX_ANTS, NODE, alpha, beta, EVAPORATION, elitism))
-    BEST_SOLUTION_LIST = pool.map(Parallel_ACO, pool_args)
+    # ALL_SOLUTIONS[0] = todas as solucoes de todas as formigas na iteracao 0
+    # ALL_SOLUTIONS[0][0] = solucao E a soma da formiga 0 na iteracao 0
+    # ALL_SOLUTIONS[0][0][0] = solucao da formiga 0 na iteracao 0
+    # ALL_SOLUTIONS[0][0][1] = soma da formiga 0 na iteracao 0
+    ALL_SOLUTIONS = ACO(ADJ_MAT, FERO_MAT, MAX_IT, MAX_ANTS, alpha, beta, EVAPORATION, elitism, cpus)
 
     overall_best = 0
-    for list_item in BEST_SOLUTION_LIST:
-        for item in list_item:
-            if item > overall_best:
-                overall_best = item
+    for iteration in range(MAX_IT):
+        for ant in range(MAX_ANTS):
+            now_sum = ALL_SOLUTIONS[iteration][ant][1]
+            if now_sum > overall_best:
+                overall_best = now_sum
 
 
     # EXP_LOG['Path'] = overall_best[0]
+    print("BEST:", overall_best)
     EXP_LOG['Biggest Sum'] = overall_best
-    EXP_LOG['Best of each iteration'] = BEST_SOLUTION_LIST
+    EXP_LOG['All Solutions'] = ALL_SOLUTIONS
     print("Code done running!")
 
     OUT_FILE_NAME = os.path.join(output_path, "exp_log.pkl")

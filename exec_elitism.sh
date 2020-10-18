@@ -15,10 +15,10 @@ mkdir logs -p
 for counter in $(seq 1 10) 
 do
     echo "Running exp on elitism: True || Counter: $counter"
-    python3 main.py --input "bases_grafos/entrada2.txt" --elitism True --id "elitism-True-entrada2-$counter" > logs/results-elitism-entrada2-elitism-True-$counter-run.log
+    python3 main.py --input "bases_grafos/entrada2.txt" --elitism --id "elitism-True-entrada2-$counter" > logs/results-elitism-entrada2-elitism-True-$counter-run.log
     
     echo "Running exp on elitism: False || Counter: $counter"
-    python3 main.py --input "bases_grafos/entrada2.txt" --elitism False --id "elitism-False-entrada2-$counter" > logs/results-elitism-entrada2-elitism-False-$counter-run.log
+    python3 main.py --input "bases_grafos/entrada2.txt" --elitism --id "elitism-False-entrada2-$counter" > logs/results-elitism-entrada2-elitism-False-$counter-run.log
 
 done
 echo "Done entrada2"
